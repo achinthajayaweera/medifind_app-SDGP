@@ -33,7 +33,7 @@ class ServicesCarousel extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 150,
+      height: 155, // Increased from 150 to fix overflow
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -100,7 +100,7 @@ class _ServiceItem extends StatelessWidget {
           const SizedBox(height: 8),
           SizedBox(
             width: 125,
-            height: 40,
+            height: 42, // Increased from 40 to give more room
             child: Text(
               name,
               textAlign: TextAlign.center,
