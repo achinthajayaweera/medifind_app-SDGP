@@ -10,48 +10,54 @@ class WelcomeBackPage extends StatefulWidget {
 class _WelcomeBackPageState extends State<WelcomeBackPage>
     with SingleTickerProviderStateMixin {
   bool _isSignInSelected = true; // Default to Sign In selected
-  late AnimationController _slideController;
-  late Animation<double> _slideAnimation;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-
-    _slideAnimation = CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeInOutCubic,
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Always reset to Sign In selected when page becomes active
-    setState(() {
-      _isSignInSelected = true;
-    });
   }
 
   @override
   void dispose() {
-    _slideController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
-  void _toggleSelection(bool isSignIn) {
-    // Navigate immediately without waiting for animation
-    if (mounted) {
-      if (isSignIn) {
-        Navigator.pushNamed(context, '/signin');
-      } else {
-        Navigator.pushNamed(context, '/signup');
-      }
+  void _navigateToPage(bool isSignIn) {
+    setState(() {
+      _isSignInSelected = isSignIn;
+    });
+
+    // Animate the pill
+    if (isSignIn) {
+      _animationController.reverse();
+    } else {
+      _animationController.forward();
     }
+
+    // Wait for animation to finish, then navigate
+    Future.delayed(const Duration(milliseconds: 350), () {
+      if (mounted) {
+        if (isSignIn) {
+          Navigator.pushNamed(context, '/signin');
+        } else {
+          Navigator.pushNamed(context, '/signup');
+        }
+        // Reset animation after navigation
+        _animationController.reset();
+        setState(() {
+          _isSignInSelected = true;
+        });
+      }
+    });
   }
 
   @override
@@ -144,21 +150,20 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                 height: 100,
                 child: Stack(
                   children: [
-                    // Sliding white pill with sharp edges on sides
+                    // Animated sliding white pill
                     AnimatedBuilder(
-                      animation: _slideAnimation,
+                      animation: _animation,
                       builder: (context, child) {
-                        // Calculate position: left side when Sign In, right side when Sign Up
+                        final screenWidth = MediaQuery.of(context).size.width;
                         final leftPosition =
-                            _slideAnimation.value * (screenWidth / 2) - 76;
+                            (_animation.value * (screenWidth / 2)) - 76;
 
                         return Positioned(
                           left: leftPosition,
                           top: 0,
                           bottom: 0,
                           child: Container(
-                            width: (screenWidth / 2) +
-                                76, // Width extends beyond screen
+                            width: (screenWidth / 2) + 76,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
@@ -177,7 +182,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                         // Sign In button
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => _toggleSelection(true),
+                            onTap: () => _navigateToPage(true),
                             child: Container(
                               color: Colors.transparent,
                               alignment: Alignment.center,
@@ -200,7 +205,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                         // Sign Up button
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => _toggleSelection(false),
+                            onTap: () => _navigateToPage(false),
                             child: Container(
                               color: Colors.transparent,
                               alignment: Alignment.center,
