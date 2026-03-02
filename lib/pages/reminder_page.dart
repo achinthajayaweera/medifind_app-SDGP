@@ -1,190 +1,390 @@
 import 'package:flutter/material.dart';
 
-class ReminderPage extends StatelessWidget {
+class ReminderPage extends StatefulWidget {
   const ReminderPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Demo reminders - replace with actual data later
-    final List<Map<String, dynamic>> reminders = [];
+  State<ReminderPage> createState() => _ReminderPageState();
+}
 
-    return Scaffold(
-      appBar: AppBar(
+class _ReminderPageState extends State<ReminderPage>
+    with TickerProviderStateMixin {
+  // Floating animations for circles
+  late AnimationController _floatController1;
+  late AnimationController _floatController2;
+  late AnimationController _floatController3;
+  late AnimationController _floatController4;
+
+  late Animation<Offset> _floatAnimation1;
+  late Animation<Offset> _floatAnimation2;
+  late Animation<Offset> _floatAnimation3;
+  late Animation<Offset> _floatAnimation4;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Floating animations for circles
+    _floatController1 = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _floatController2 = AnimationController(
+      duration: const Duration(seconds: 4),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _floatController3 = AnimationController(
+      duration: const Duration(seconds: 5),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _floatController4 = AnimationController(
+      duration: const Duration(seconds: 3, milliseconds: 500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    // Different floating patterns for each circle
+    _floatAnimation1 = Tween<Offset>(
+      begin: const Offset(0, 0),
+      end: const Offset(25, -35),
+    ).animate(
+        CurvedAnimation(parent: _floatController1, curve: Curves.easeInOut));
+
+    _floatAnimation2 = Tween<Offset>(
+      begin: const Offset(0, 0),
+      end: const Offset(-20, 30),
+    ).animate(
+        CurvedAnimation(parent: _floatController2, curve: Curves.easeInOut));
+
+    _floatAnimation3 = Tween<Offset>(
+      begin: const Offset(0, 0),
+      end: const Offset(35, 20),
+    ).animate(
+        CurvedAnimation(parent: _floatController3, curve: Curves.easeInOut));
+
+    _floatAnimation4 = Tween<Offset>(
+      begin: const Offset(0, 0),
+      end: const Offset(-25, -30),
+    ).animate(
+        CurvedAnimation(parent: _floatController4, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _floatController1.dispose();
+    _floatController2.dispose();
+    _floatController3.dispose();
+    _floatController4.dispose();
+    super.dispose();
+  }
+
+  void _showUnderDevelopmentDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
-          'Medicine Reminders',
+          'Coming Soon',
           style: TextStyle(
             fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF0796DE),
           ),
         ),
-        backgroundColor: const Color(0xFF0796DE),
-        foregroundColor: Colors.white,
+        content: const Text(
+          'The "Add Reminder" feature is currently under development. Stay tuned for updates!',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 14,
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Add reminder feature will be implemented'),
-                ),
-              );
-            },
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF0796DE),
+              ),
+            ),
           ),
         ],
       ),
-      body: reminders.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.alarm_off,
-                    size: 100,
-                    color: Colors.grey[300],
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'No reminders set',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF919191),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Add reminders for your medications',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      color: Color(0xFF919191),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text('Add reminder feature will be implemented'),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text(
-                      'Add Reminder',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0796DE),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 15,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: reminders.length,
-              itemBuilder: (context, index) {
-                final reminder = reminders[index];
-                return _ReminderItem(
-                  medicineName: reminder['medicine'],
-                  time: reminder['time'],
-                  dosage: reminder['dosage'],
-                  isActive: reminder['isActive'],
-                );
-              },
-            ),
     );
   }
-}
-
-class _ReminderItem extends StatelessWidget {
-  final String medicineName;
-  final String time;
-  final String dosage;
-  final bool isActive;
-
-  const _ReminderItem({
-    required this.medicineName,
-    required this.time,
-    required this.dosage,
-    required this.isActive,
-  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF4F4F4),
-        border: Border.all(
-          width: 1,
-          color: const Color(0xFFEFEFEF),
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
+    return Scaffold(
+      body: Stack(
         children: [
+          // Blue gradient background
           Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: const Color(0xFF0796DE).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.medication,
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
               color: Color(0xFF0796DE),
             ),
           ),
-          const SizedBox(width: 15),
-          Expanded(
+
+          // Floating decorative circles
+          _buildDecorativeCircles(),
+
+          // Main content
+          SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  medicineName,
-                  style: const TextStyle(
-                    color: Color(0xFF1E1E1E),
-                    fontSize: 16,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
+                // Top padding
+                const SizedBox(height: 40),
+
+                // Title
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    'A healthy day\nWe\'ll take care of you',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '$dosage • $time',
-                  style: const TextStyle(
-                    color: Color(0xFF919191),
-                    fontSize: 14,
-                    fontFamily: 'Poppins',
+
+                const SizedBox(height: 40),
+
+                // Sample reminder cards
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        _buildReminderCard(
+                          title: 'Drink Water',
+                          times: ['8:00 AM', '1:00 PM', '7:00 PM'],
+                        ),
+                        const SizedBox(height: 16),
+                        _buildReminderCard(
+                          title: 'Take Vitamins',
+                          times: ['9:00 AM'],
+                        ),
+                        const SizedBox(height: 16),
+                        _buildReminderCard(
+                          title: 'Blood Pressure Check',
+                          times: ['8:00 AM', '8:00 PM'],
+                        ),
+                        const SizedBox(height: 100),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          Switch(
-            value: isActive,
-            onChanged: (value) {},
-            activeColor: const Color(0xFF0796DE),
+
+          // Bottom "Add Reminder" button
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: 40,
+            child: ElevatedButton(
+              onPressed: _showUnderDevelopmentDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 8,
+                shadowColor: Colors.black.withOpacity(0.3),
+              ),
+              child: const Text(
+                'Add Reminder',
+                style: TextStyle(
+                  color: Color(0xFF0796DE),
+                  fontSize: 18,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildReminderCard(
+      {required String title, required List<String> times}) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFF0796DE),
+              fontSize: 18,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Times
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: times
+                .map((time) => Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0796DE).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFF0796DE).withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        time,
+                        style: const TextStyle(
+                          color: Color(0xFF0796DE),
+                          fontSize: 14,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDecorativeCircles() {
+    return Stack(
+      children: [
+        // Circle 1 - Top left
+        AnimatedBuilder(
+          animation: _floatAnimation1,
+          builder: (context, child) {
+            final offset = _floatAnimation1.value;
+            return Positioned(
+              left: 30 + offset.dx,
+              top: 80 + offset.dy,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(width: 20, color: const Color(0xFF10A2EA)),
+                ),
+              ),
+            );
+          },
+        ),
+
+        // Circle 2 - Top right
+        AnimatedBuilder(
+          animation: _floatAnimation2,
+          builder: (context, child) {
+            final offset = _floatAnimation2.value;
+            return Positioned(
+              right: 20 + offset.dx,
+              top: 120 + offset.dy,
+              child: Opacity(
+                opacity: 0.30,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: const Alignment(0.93, 0.35),
+                      end: const Alignment(0.06, 0.40),
+                      colors: [
+                        const Color(0xAFFDEDCA),
+                        const Color(0xFF0A9BE2)
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+
+        // Circle 3 - Middle
+        AnimatedBuilder(
+          animation: _floatAnimation3,
+          builder: (context, child) {
+            final offset = _floatAnimation3.value;
+            return Positioned(
+              left: MediaQuery.of(context).size.width / 2 - 60 + offset.dx,
+              top: MediaQuery.of(context).size.height / 2 - 60 + offset.dy,
+              child: Opacity(
+                opacity: 0.20,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: const Alignment(0.93, 0.35),
+                      end: const Alignment(0.06, 0.40),
+                      colors: [
+                        const Color(0xFFFDEDCA),
+                        const Color(0xFF0A9BE2)
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+
+        // Circle 4 - Bottom right
+        AnimatedBuilder(
+          animation: _floatAnimation4,
+          builder: (context, child) {
+            final offset = _floatAnimation4.value;
+            return Positioned(
+              right: 40 + offset.dx,
+              bottom: 150 + offset.dy,
+              child: Container(
+                width: 110,
+                height: 110,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(width: 20, color: const Color(0xFF10A2EA)),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
