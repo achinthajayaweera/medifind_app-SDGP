@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'nearby_pharmacy_page.dart';
 
 // ── Data model ────────────────────────────────────────────────────────────────
 enum MedicineType { capsule, tablet, syrup, vitamin }
@@ -310,13 +311,11 @@ class _PrescriptionMedicineListPageState
                       height: 54,
                       child: ElevatedButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Nearby pharmacy search coming soon!'),
-                              backgroundColor: Color(0xFF0796DE),
-                            ),
-                          );
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const NearbyPharmacyPage(),
+                              ));
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0796DE),
