@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'registration_state.dart';
+import 'home_page.dart';
 
 class DocVerificationFailedPage extends StatelessWidget {
   const DocVerificationFailedPage({super.key});
@@ -231,7 +233,12 @@ class DocVerificationFailedPage extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             // Go back to upload page to try again
-                            Navigator.pop(context);
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomePage()),
+                              (route) => false,
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0796DE),

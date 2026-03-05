@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'registration_state.dart';
+import 'home_page.dart';
 
 class DocVerificationPendingPage extends StatelessWidget {
   const DocVerificationPendingPage({super.key});
@@ -157,8 +159,12 @@ class DocVerificationPendingPage extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             // Go back to home
-                            Navigator.popUntil(
-                                context, (route) => route.isFirst);
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomePage()),
+                              (route) => false,
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0796DE),

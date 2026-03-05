@@ -1,18 +1,45 @@
 import 'package:flutter/material.dart';
+import 'registration_state.dart';
 import 'pharmacy_details_form_page.dart';
+import 'doc_verification_success_page.dart';
+import 'doc_verification_pending_page.dart';
+import 'doc_verification_failed_page.dart';
 
 class PharmacyRegistrationPage extends StatelessWidget {
   const PharmacyRegistrationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // ── If already submitted, go straight to the status page ──────────
+    final state = RegistrationState();
+    if (state.hasSubmitted) {
+      // Use addPostFrameCallback so we don't push during build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Widget page;
+        switch (state.status) {
+          case RegistrationStatus.success:
+            page = const DocVerificationSuccessPage();
+            break;
+          case RegistrationStatus.pending:
+            page = const DocVerificationPendingPage();
+            break;
+          case RegistrationStatus.failed:
+            page = const DocVerificationFailedPage();
+            break;
+          default:
+            return;
+        }
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      });
+    }
+
     return Scaffold(
       body: Stack(
         children: [
-          // Background with decorative circles (same as home page)
           _buildBackground(),
-
-          // Main content
           SafeArea(
             child: Column(
               children: [
@@ -23,10 +50,7 @@ class PharmacyRegistrationPage extends StatelessWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                        ),
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Expanded(
@@ -56,7 +80,7 @@ class PharmacyRegistrationPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 48), // Balance the back button
+                      const SizedBox(width: 48),
                     ],
                   ),
                 ),
@@ -76,7 +100,6 @@ class PharmacyRegistrationPage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const SizedBox(height: 15),
-
                         // Drag handle
                         Container(
                           width: 33,
@@ -86,7 +109,6 @@ class PharmacyRegistrationPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2.5),
                           ),
                         ),
-
                         const SizedBox(height: 15),
 
                         // MediFind Logo
@@ -98,15 +120,11 @@ class PharmacyRegistrationPage extends StatelessWidget {
                             'assets/images/Medifind_logo.png',
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
-                              // Fallback if logo file not found
                               return Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
-                                    Icons.local_pharmacy,
-                                    size: 70,
-                                    color: const Color(0xFF0796DE),
-                                  ),
+                                  Icon(Icons.local_pharmacy,
+                                      size: 70, color: const Color(0xFF0796DE)),
                                   const SizedBox(height: 8),
                                   const Text(
                                     'MediFind',
@@ -125,7 +143,7 @@ class PharmacyRegistrationPage extends StatelessWidget {
 
                         const SizedBox(height: 10),
 
-                        // Description text
+                        // Description
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 25),
                           child: Text(
@@ -161,14 +179,13 @@ class PharmacyRegistrationPage extends StatelessWidget {
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF0796DE),
+                                elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                elevation: 0,
                               ),
                               child: const Text(
                                 'Register',
-                                textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -202,7 +219,6 @@ class PharmacyRegistrationPage extends StatelessWidget {
       color: const Color(0xFF0796DE),
       child: Stack(
         children: [
-          // Top left circle
           Positioned(
             left: 37,
             top: -99,
@@ -210,15 +226,11 @@ class PharmacyRegistrationPage extends StatelessWidget {
               width: 183,
               height: 183,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  width: 30,
-                  color: const Color(0xFF10A2EA),
-                ),
-              ),
+                  shape: BoxShape.circle,
+                  border:
+                      Border.all(width: 30, color: const Color(0xFF10A2EA))),
             ),
           ),
-          // Middle gradient circle
           Positioned(
             left: 130.01,
             top: 197.85,
@@ -231,20 +243,16 @@ class PharmacyRegistrationPage extends StatelessWidget {
                   height: 153.81,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: const Alignment(0.93, 0.35),
-                      end: const Alignment(0.06, 0.40),
-                      colors: [
-                        const Color(0xAFFDEDCA),
-                        const Color(0xFF0A9BE2)
-                      ],
+                    gradient: const LinearGradient(
+                      begin: Alignment(0.93, 0.35),
+                      end: Alignment(0.06, 0.40),
+                      colors: [Color(0xAFFDEDCA), Color(0xFF0A9BE2)],
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          // Top left small circle
           Positioned(
             left: 32.30,
             top: 63,
@@ -257,20 +265,16 @@ class PharmacyRegistrationPage extends StatelessWidget {
                   height: 89.35,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: const Alignment(0.93, 0.35),
-                      end: const Alignment(0.06, 0.40),
-                      colors: [
-                        const Color(0xFFFDEDCA),
-                        const Color(0xFF0A9BE2)
-                      ],
+                    gradient: const LinearGradient(
+                      begin: Alignment(0.93, 0.35),
+                      end: Alignment(0.06, 0.40),
+                      colors: [Color(0xFFFDEDCA), Color(0xFF0A9BE2)],
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          // Top middle circle
           Positioned(
             left: 110.98,
             top: 32.77,
@@ -283,20 +287,16 @@ class PharmacyRegistrationPage extends StatelessWidget {
                   height: 94.08,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: const Alignment(0.93, 0.35),
-                      end: const Alignment(0.06, 0.40),
-                      colors: [
-                        const Color(0xAFFDEDCA),
-                        const Color(0xFF0A9BE2)
-                      ],
+                    gradient: const LinearGradient(
+                      begin: Alignment(0.93, 0.35),
+                      end: Alignment(0.06, 0.40),
+                      colors: [Color(0xAFFDEDCA), Color(0xFF0A9BE2)],
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          // Top right border circle
           Positioned(
             left: 310.47,
             top: 65.17,
@@ -306,12 +306,9 @@ class PharmacyRegistrationPage extends StatelessWidget {
                 width: 167,
                 height: 167,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    width: 30,
-                    color: const Color(0xFF10A2EA),
-                  ),
-                ),
+                    shape: BoxShape.circle,
+                    border:
+                        Border.all(width: 30, color: const Color(0xFF10A2EA))),
               ),
             ),
           ),

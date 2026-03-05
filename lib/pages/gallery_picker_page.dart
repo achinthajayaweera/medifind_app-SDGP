@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'registration_state.dart';
 import 'doc_verification_success_page.dart';
 import 'doc_verification_pending_page.dart';
 import 'doc_verification_failed_page.dart';
@@ -12,60 +13,92 @@ class GalleryPickerPage extends StatefulWidget {
 }
 
 class _GalleryPickerPageState extends State<GalleryPickerPage> {
-  bool _imageSelected = false;
-
   void _onBrowseTapped() {
-    // Simulate selecting an image
-    setState(() => _imageSelected = true);
-
-    // Show uploading dialog then navigate to verification result
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(color: Color(0xFF11A2EB)),
-              SizedBox(height: 16),
-              Text(
-                'Uploading document...',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  color: Color(0xFF2D2D2D),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    _showUploadDialog();
 
     Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context); // close dialog
+      if (!mounted) return;
+      Navigator.pop(context);
 
       final result = Random().nextInt(3);
+      RegistrationStatus status;
       Widget page;
+
       if (result == 0) {
+        status = RegistrationStatus.success;
         page = const DocVerificationSuccessPage();
       } else if (result == 1) {
+        status = RegistrationStatus.pending;
         page = const DocVerificationPendingPage();
       } else {
+        status = RegistrationStatus.failed;
         page = const DocVerificationFailedPage();
       }
+
+      RegistrationState().setStatus(status);
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => page),
       );
     });
+  }
+
+  void _showUploadDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) => Material(
+        type: MaterialType.transparency,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 30),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0796DE),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x3F000000),
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
+                ),
+                SizedBox(height: 18),
+                Text(
+                  'Uploading document...',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Please wait a moment',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 11,
+                    color: Color(0xFFA2E0FF),
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -77,7 +110,7 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
         color: const Color(0xFF0796DE),
         child: Stack(
           children: [
-            // ── Background decorative circles ──────────────────────────
+            // Background circles
             Positioned(
               left: 37,
               top: -99,
@@ -86,8 +119,7 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
                 height: 183,
                 decoration: const ShapeDecoration(
                   shape: OvalBorder(
-                    side: BorderSide(width: 30, color: Color(0xFF10A2EA)),
-                  ),
+                      side: BorderSide(width: 30, color: Color(0xFF10A2EA))),
                 ),
               ),
             ),
@@ -160,22 +192,19 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
                 height: 167,
                 decoration: const ShapeDecoration(
                   shape: OvalBorder(
-                    side: BorderSide(width: 30, color: Color(0xFF10A2EA)),
-                  ),
+                      side: BorderSide(width: 30, color: Color(0xFF10A2EA))),
                 ),
               ),
             ),
 
-            // ── SafeArea content ───────────────────────────────────────
             SafeArea(
               child: Column(
                 children: [
-                  // ── Header ─────────────────────────────────────────
+                  // Header
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         IconButton(
                           icon:
@@ -216,7 +245,7 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
                     ),
                   ),
 
-                  // ── White card ──────────────────────────────────────
+                  // White card
                   Expanded(
                     child: Container(
                       width: double.infinity,
@@ -246,10 +275,9 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
                                   ),
                                 ),
                               ),
-
                               const SizedBox(height: 24),
 
-                              // ── Tap to browse card ──────────────────
+                              // Tap to browse card
                               GestureDetector(
                                 onTap: _onBrowseTapped,
                                 child: Container(
@@ -262,42 +290,34 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
                                       end: Alignment.bottomRight,
                                       colors: [
                                         Color(0xFFEBF6FF),
-                                        Color(0xFFF5FBFF),
+                                        Color(0xFFF5FBFF)
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
-                                      color: const Color(0xFF11A2EB),
-                                      width: 1.0,
-                                    ),
+                                        color: const Color(0xFF11A2EB),
+                                        width: 1.0),
                                     boxShadow: const [
                                       BoxShadow(
-                                        color: Color(0x1A000000),
-                                        blurRadius: 8,
-                                        offset: Offset(0, 4),
-                                      ),
+                                          color: Color(0x1A000000),
+                                          blurRadius: 8,
+                                          offset: Offset(0, 4)),
                                     ],
                                   ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      // Blue circle icon
                                       Container(
                                         width: 56,
                                         height: 56,
                                         decoration: const ShapeDecoration(
-                                          color: Color(0xFF11A2EB),
-                                          shape: OvalBorder(),
-                                        ),
-                                        child: const Icon(
-                                          Icons.image_rounded,
-                                          color: Colors.white,
-                                          size: 28,
-                                        ),
+                                            color: Color(0xFF11A2EB),
+                                            shape: OvalBorder()),
+                                        child: const Icon(Icons.image_rounded,
+                                            color: Colors.white, size: 28),
                                       ),
-                                      const SizedBox(height: 16),
-                                      // "Tap to browse"
-                                      const Text(
+                                      SizedBox(height: 16),
+                                      Text(
                                         'Tap to browse',
                                         style: TextStyle(
                                           color: Color(0xFF2D2D2D),
@@ -307,9 +327,8 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
                                           height: 1.50,
                                         ),
                                       ),
-                                      const SizedBox(height: 6),
-                                      // Subtitle
-                                      const Text(
+                                      SizedBox(height: 6),
+                                      Text(
                                         'Select a Registration image from your gallery',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
@@ -327,7 +346,7 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
 
                               const SizedBox(height: 36),
 
-                              // ── Image Requirements ──────────────────
+                              // Image Requirements
                               const Text(
                                 'Image Requirements',
                                 style: TextStyle(
@@ -349,7 +368,7 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
 
                               const SizedBox(height: 40),
 
-                              // ── Need help uploading? ────────────────
+                              // Need help
                               Center(
                                 child: Column(
                                   children: [
@@ -384,7 +403,6 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
                                   ],
                                 ),
                               ),
-
                               const SizedBox(height: 30),
                             ],
                           ),
@@ -410,23 +428,19 @@ class _GalleryPickerPageState extends State<GalleryPickerPage> {
           const Text(
             '• ',
             style: TextStyle(
-              color: Color(0xFF11A2EB),
-              fontSize: 12,
-              fontFamily: 'Arimo',
-              fontWeight: FontWeight.w400,
-              height: 1.33,
-            ),
+                color: Color(0xFF11A2EB),
+                fontSize: 12,
+                fontFamily: 'Arimo',
+                height: 1.33),
           ),
           Expanded(
             child: Text(
               text,
               style: const TextStyle(
-                color: Color(0xFF495565),
-                fontSize: 12,
-                fontFamily: 'Arimo',
-                fontWeight: FontWeight.w400,
-                height: 1.33,
-              ),
+                  color: Color(0xFF495565),
+                  fontSize: 12,
+                  fontFamily: 'Arimo',
+                  height: 1.33),
             ),
           ),
         ],

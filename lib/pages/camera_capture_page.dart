@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'registration_state.dart';
 import 'doc_verification_success_page.dart';
 import 'doc_verification_pending_page.dart';
 import 'doc_verification_failed_page.dart';
@@ -15,50 +16,30 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
   bool _flashOn = false;
 
   void _onCapture() {
-    // Show uploading dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(color: Color(0xFF11A2EB)),
-              SizedBox(height: 16),
-              Text(
-                'Uploading document...',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  color: Color(0xFF2D2D2D),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    _showUploadDialog();
 
-    // After 2 seconds, navigate to one of the 3 verification result pages
     Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
       Navigator.pop(context); // close dialog
 
-      // Randomly pick success / pending / failed for demo
+      // Pick random result for demo; replace with real API result later
       final result = Random().nextInt(3);
+      RegistrationStatus status;
       Widget page;
+
       if (result == 0) {
+        status = RegistrationStatus.success;
         page = const DocVerificationSuccessPage();
       } else if (result == 1) {
+        status = RegistrationStatus.pending;
         page = const DocVerificationPendingPage();
       } else {
+        status = RegistrationStatus.failed;
         page = const DocVerificationFailedPage();
       }
+
+      // Save the submission status globally
+      RegistrationState().setStatus(status);
 
       Navigator.pushReplacement(
         context,
@@ -67,13 +48,69 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
     });
   }
 
+  void _showUploadDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) => Material(
+        type: MaterialType.transparency,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 30),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0796DE),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x3F000000),
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
+                ),
+                SizedBox(height: 18),
+                Text(
+                  'Uploading document...',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Please wait a moment',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 11,
+                    color: Color(0xFFA2E0FF),
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        // Dark gradient background — matches Figma exactly
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment(0.00, 0.00),
@@ -83,7 +120,7 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
         ),
         child: Stack(
           children: [
-            // ── Top gradient — starts at 0 so no border shows at top ──
+            // Top gradient — covers full top
             Positioned(
               left: 0,
               top: 0,
@@ -103,7 +140,7 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
               ),
             ),
 
-            // ── Camera viewfinder frame ────────────────────────────────
+            // Camera viewfinder frame
             Positioned(
               left: 22,
               top: 130,
@@ -112,17 +149,15 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
               child: Container(
                 decoration: ShapeDecoration(
                   shape: RoundedRectangleBorder(
-                    side: const BorderSide(
-                      width: 1.48,
-                      color: Color(0x66FFFEFE),
-                    ),
+                    side:
+                        const BorderSide(width: 1.48, color: Color(0x66FFFEFE)),
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
             ),
 
-            // ── "Align Registration within frame" pill — centered ──────
+            // "Align Registration within frame" pill — centered
             Positioned(
               left: 0,
               right: 0,
@@ -156,7 +191,7 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
               ),
             ),
 
-            // ── Bottom gradient + capture button + label ───────────────
+            // Bottom gradient + capture button + label
             Positioned(
               left: 0,
               bottom: 0,
@@ -176,7 +211,7 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Capture button — white ring + blue inner circle, centered
+                    // Capture button — centered
                     GestureDetector(
                       onTap: _onCapture,
                       child: Container(
@@ -186,9 +221,7 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
                           color: Colors.white,
                           shape: const RoundedRectangleBorder(
                             side: BorderSide(
-                              width: 3.70,
-                              color: Color(0xFF11A2EB),
-                            ),
+                                width: 3.70, color: Color(0xFF11A2EB)),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(100)),
                           ),
@@ -219,10 +252,7 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 12),
-
-                    // "Tap to capture Registration" label
                     const Text(
                       'Tap to capture Registration',
                       textAlign: TextAlign.center,
@@ -239,18 +269,16 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
               ),
             ),
 
-            // ── Top bar (back + title + flash) — on top of everything ──
+            // Top bar — back + title + flash
             SafeArea(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 11, vertical: 0),
+                padding: const EdgeInsets.symmetric(horizontal: 11),
                 child: SizedBox(
                   height: 58,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Back button
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Container(
@@ -260,15 +288,10 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
                             color: Colors.black.withOpacity(0.40),
                             shape: const OvalBorder(),
                           ),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 20,
-                          ),
+                          child: const Icon(Icons.arrow_back,
+                              color: Colors.white, size: 20),
                         ),
                       ),
-
-                      // Title
                       const Text(
                         'Take Photo',
                         textAlign: TextAlign.center,
@@ -280,8 +303,6 @@ class _CameraCapturePageState extends State<CameraCapturePage> {
                           height: 1,
                         ),
                       ),
-
-                      // Flash toggle button
                       GestureDetector(
                         onTap: () => setState(() => _flashOn = !_flashOn),
                         child: Container(
