@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'animated_background.dart';
 import 'registration_state.dart';
 import 'pharmacy_details_form_page.dart';
 import 'doc_verification_success_page.dart';
@@ -39,7 +40,7 @@ class PharmacyRegistrationPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          _buildBackground(),
+          const AnimatedBackground(),
           SafeArea(
             child: Column(
               children: [
