@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'upload_prescription_page.dart';
+import 'upload_prescription_options_page.dart';
 
 class UploadPrescriptionMainPage extends StatelessWidget {
   const UploadPrescriptionMainPage({super.key});
@@ -159,7 +159,7 @@ class UploadPrescriptionMainPage extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const UploadPrescriptionPage(),
+                                        UploadPrescriptionOptionsPage(),
                                   ),
                                 );
                               },

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'upload_prescription_page.dart';
+import 'upload_prescription_options_page.dart';
 import 'reminder_page.dart';
 import 'previous_orders_page.dart';
 import 'health_profile_page.dart';
-import 'pharmacy_registration_page.dart';
 
 class AllServicesPage extends StatefulWidget {
   const AllServicesPage({super.key});
@@ -46,7 +45,7 @@ class _AllServicesPageState extends State<AllServicesPage>
       {
         'name': 'Upload Prescription',
         'icon': Icons.upload_file,
-        'page': const UploadPrescriptionPage(),
+        'page': UploadPrescriptionOptionsPage(),
       },
       {
         'name': 'Reminder',
@@ -62,11 +61,6 @@ class _AllServicesPageState extends State<AllServicesPage>
         'name': 'View Your Account',
         'icon': Icons.account_circle,
         'page': const HealthProfilePage(),
-      },
-      {
-        'name': 'Pharmacy Registration',
-        'icon': Icons.store,
-        'page': const PharmacyRegistrationPage(),
       },
     ];
 
