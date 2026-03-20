@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'prescription_camera_page.dart';
 import 'prescription_gallery_page.dart';
 
+// UploadPrescriptionOptionsPage
+// Allows users to upload a prescription via camera, gallery,
+// or by entering medicine details manually.
+// OTP verification is required before any upload method is accessed.
 class UploadPrescriptionOptionsPage extends StatefulWidget {
   const UploadPrescriptionOptionsPage({super.key});
 
@@ -40,6 +44,7 @@ class _UploadPrescriptionOptionsPageState
     super.dispose();
   }
 
+  // Validates OTP is entered before allowing any upload action
   void _requireOtp(VoidCallback onSuccess) {
     if (_otpController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -51,6 +56,7 @@ class _UploadPrescriptionOptionsPageState
     onSuccess();
   }
 
+  // Toggles the manual medicine entry section open/closed
   void _toggleManual() {
     if (_otpController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -76,6 +82,7 @@ class _UploadPrescriptionOptionsPageState
     }
   }
 
+  // Adds a new medicine row to the manual entry list
   void _addMed() {
     setState(() => _meds.add(_Med()));
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -86,6 +93,7 @@ class _UploadPrescriptionOptionsPageState
     });
   }
 
+  // Removes a medicine row at the given index (minimum 1 row enforced)
   void _removeMed(int i) {
     if (_meds.length == 1) return;
     _meds[i].dispose();
@@ -882,6 +890,7 @@ class _UploadPrescriptionOptionsPageState
   }
 }
 
+// Data model for a single medicine entry in the manual input form
 class _Med {
   final name = TextEditingController();
   final dosage = TextEditingController();
