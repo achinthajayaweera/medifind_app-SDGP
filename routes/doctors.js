@@ -33,4 +33,16 @@ router.post("/", async (req, res) => {
   }
 });
 
+// UPDATE doctor
+router.put("/:id", async (req, res) => {
+  try {
+    const doctor = await Doctor.findByPk(req.params.id);
+    if (!doctor) return res.status(404).json({ error: "Doctor not found" });
+    await doctor.update(req.body);
+    res.json(doctor);
+  } catch (err) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
 module.exports = router;
