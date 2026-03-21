@@ -6,7 +6,10 @@ module.exports = {
       id: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV4, primaryKey: true },
       fullName: { type: Sequelize.STRING, allowNull: false },
       email: { type: Sequelize.STRING, allowNull: false, unique: true },
-      licenseNumber: { type: Sequelize.STRING, allowNull: false, unique: true }
+      licenseNumber: { type: Sequelize.STRING, allowNull: false, unique: true },
+      phone: { type: Sequelize.STRING },
+      createdAt: { type: Sequelize.DATE, defaultValue: Sequelize.fn('NOW') },
+      updatedAt: { type: Sequelize.DATE, defaultValue: Sequelize.fn('NOW') }
     });
   },
 
