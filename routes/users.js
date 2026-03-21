@@ -148,4 +148,19 @@ router.post("/", async (req, res) => {
   }
 });
 
+// UPDATE user
+router.put("/:id", async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    await user.update(req.body);
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
 module.exports = router;
