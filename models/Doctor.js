@@ -8,5 +8,9 @@ module.exports = (sequelize, DataTypes) => {
     phone: { type: DataTypes.STRING, allowNull: true },
   });
 
+  Doctor.associate = (models) => {
+    Doctor.hasMany(models.Prescription, { foreignKey: 'doctorId', as: 'prescriptions' });
+  };
+
   return Doctor;
 };
