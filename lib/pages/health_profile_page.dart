@@ -2,6 +2,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'user_store.dart';
 import 'sign_in_page.dart';
+import 'edit_profile_page.dart';
+import 'notifications_page.dart';
+import 'privacy_security_page.dart';
+import 'help_support_page.dart';
 
 // ── Orb physics ───────────────────────────────────────────────────────────────
 class _OrbState {
@@ -102,7 +106,6 @@ class _HealthProfilePageState extends State<HealthProfilePage>
     final dt = now.difference(_lastTime!).inMicroseconds / 1e6;
     _lastTime = now;
     if (dt <= 0 || dt > 0.1) return;
-
     setState(() {
       for (final orb in _orbs) {
         final dx = orb.targetX - orb.x;
@@ -154,13 +157,19 @@ class _HealthProfilePageState extends State<HealthProfilePage>
               : const BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    begin: Alignment(0.93, 0.35),
-                    end: Alignment(0.06, 0.40),
-                    colors: [Color(0xAFFDEDCA), Color(0xFF0A9BE2)],
-                  )),
+                      begin: Alignment(0.93, 0.35),
+                      end: Alignment(0.06, 0.40),
+                      colors: [Color(0xAFFDEDCA), Color(0xFF0A9BE2)])),
         ),
       ),
     );
+  }
+
+  // ── Navigate to edit profile and refresh on return ─────────────────────────
+  Future<void> _openEdit() async {
+    final updated = await Navigator.push(
+        context, MaterialPageRoute(builder: (_) => const EditProfilePage()));
+    if (updated == true && mounted) setState(() {});
   }
 
   void _showLogoutDialog() {
@@ -183,96 +192,86 @@ class _HealthProfilePageState extends State<HealthProfilePage>
                     offset: const Offset(0, 10))
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
                   width: 56,
                   height: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFEDED),
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: const BoxDecoration(
+                      color: Color(0xFFFFEDED), shape: BoxShape.circle),
                   child: const Icon(Icons.logout_rounded,
-                      color: Color(0xFFE53935), size: 26),
-                ),
-                const SizedBox(height: 16),
-                const Text('Log Out?',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A1A))),
-                const SizedBox(height: 8),
-                const Text('Are you sure you want to log out\nof your account?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Poppins',
-                        color: Color(0xFF9E9E9E),
-                        height: 1.5)),
-                const SizedBox(height: 24),
-                Row(children: [
-                  Expanded(
+                      color: Color(0xFFE53935), size: 26)),
+              const SizedBox(height: 16),
+              const Text('Log Out?',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A1A1A))),
+              const SizedBox(height: 8),
+              const Text('Are you sure you want to log out\nof your account?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontFamily: 'Poppins',
+                      color: Color(0xFF9E9E9E),
+                      height: 1.5)),
+              const SizedBox(height: 24),
+              Row(children: [
+                Expanded(
                     child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFF5F7FA),
-                            borderRadius: BorderRadius.circular(14)),
-                        child: const Text('Cancel',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF555555))),
-                      ),
-                    ),
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    decoration: BoxDecoration(
+                        color: const Color(0xFFF5F7FA),
+                        borderRadius: BorderRadius.circular(14)),
+                    child: const Text('Cancel',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF555555))),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                )),
+                const SizedBox(width: 12),
+                Expanded(
                     child: GestureDetector(
-                      onTap: () {
-                        // Clear user data
-                        UserStore.instance.name = 'User';
-                        UserStore.instance.email = '';
-                        UserStore.instance.emoji = '👤';
-                        UserStore.instance.avatarColorValue = 0xFF0796DE;
-                        UserStore.instance.phone = '';
-                        UserStore.instance.dateOfBirth = '';
-                        UserStore.instance.bloodType = '';
-                        UserStore.instance.allergies = '';
-                        UserStore.instance.chronicConditions = '';
-                        UserStore.instance.age = 0;
-                        UserStore.instance.weight = 0;
-                        UserStore.instance.hasCompletedOnboarding = false;
-                        // Navigate to sign in, clear all routes
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SignInPage()),
-                          (route) => false,
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFE53935),
-                            borderRadius: BorderRadius.circular(14)),
-                        child: const Text('Log Out',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white)),
-                      ),
-                    ),
+                  onTap: () {
+                    UserStore.instance.name = 'User';
+                    UserStore.instance.email = '';
+                    UserStore.instance.emoji = '👤';
+                    UserStore.instance.avatarColorValue = 0xFF0796DE;
+                    UserStore.instance.phone = '';
+                    UserStore.instance.dateOfBirth = '';
+                    UserStore.instance.bloodType = '';
+                    UserStore.instance.allergies = '';
+                    UserStore.instance.chronicConditions = '';
+                    UserStore.instance.age = 0;
+                    UserStore.instance.weight = 0;
+                    UserStore.instance.hasCompletedOnboarding = false;
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SignInPage()),
+                      (route) => false,
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    decoration: BoxDecoration(
+                        color: const Color(0xFFE53935),
+                        borderRadius: BorderRadius.circular(14)),
+                    child: const Text('Log Out',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white)),
                   ),
-                ]),
-              ],
-            ),
+                )),
+              ]),
+            ]),
           ),
         ),
       ),
@@ -305,112 +304,106 @@ class _HealthProfilePageState extends State<HealthProfilePage>
           children: [
             ..._orbs.map(_buildOrb),
             SafeArea(
-              child: Column(
-                children: [
-                  // Top bar
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
-                    child: Row(
-                      children: [
-                        _NavBtn(
-                            icon: Icons.arrow_back_ios_new_rounded,
-                            onTap: () => Navigator.pop(context)),
-                        const Expanded(
-                          child: Text('My Profile',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w600)),
-                        ),
-                        _NavBtn(icon: Icons.edit_outlined, onTap: () {}),
-                      ],
-                    ),
-                  ),
+              child: Column(children: [
+                // ── Top bar ───────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                  child: Row(children: [
+                    _NavBtn(
+                        icon: Icons.arrow_back_ios_new_rounded,
+                        onTap: () => Navigator.pop(context)),
+                    const Expanded(
+                        child: Text('My Profile',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600))),
+                    // ── Edit button now opens EditProfilePage ───────────
+                    _NavBtn(icon: Icons.edit_outlined, onTap: _openEdit),
+                  ]),
+                ),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  // Avatar — shows emoji if set, else coloured icon
-                  Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      Container(
-                        width: 86,
-                        height: 86,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: UserStore.instance.emoji.isEmpty
-                              ? avatarColor
-                              : avatarColor.withOpacity(0.15),
-                          border: Border.all(color: avatarColor, width: 3),
-                          boxShadow: [
-                            BoxShadow(
-                                color: avatarColor.withOpacity(0.4),
-                                blurRadius: 24,
-                                offset: const Offset(0, 8))
-                          ],
-                        ),
-                        child: Center(
-                          child: UserStore.instance.emoji.isEmpty
+                // ── Avatar — tapping also opens edit ─────────────────
+                GestureDetector(
+                  onTap: _openEdit,
+                  child: Stack(alignment: Alignment.bottomRight, children: [
+                    Container(
+                      width: 86,
+                      height: 86,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: UserStore.instance.emoji.isEmpty ||
+                                UserStore.instance.emoji == '👤'
+                            ? avatarColor
+                            : avatarColor.withOpacity(0.15),
+                        border: Border.all(color: avatarColor, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                              color: avatarColor.withOpacity(0.4),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8))
+                        ],
+                      ),
+                      child: Center(
+                          child: UserStore.instance.emoji.isEmpty ||
+                                  UserStore.instance.emoji == '👤'
                               ? const Icon(Icons.person_rounded,
                                   size: 48, color: Colors.white)
                               : Text(UserStore.instance.emoji,
-                                  style: const TextStyle(fontSize: 44)),
-                        ),
-                      ),
-                      Container(
+                                  style: const TextStyle(fontSize: 44))),
+                    ),
+                    Container(
                         width: 26,
                         height: 26,
                         decoration: BoxDecoration(
-                          color: avatarColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                              color: const Color(0xFF0796DE), width: 2),
-                        ),
+                            color: avatarColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: const Color(0xFF0796DE), width: 2)),
                         child: const Icon(Icons.edit_rounded,
-                            size: 13, color: Colors.white),
-                      ),
-                    ],
-                  ),
+                            size: 13, color: Colors.white)),
+                  ]),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  Text(name,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3)),
+                Text(name,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3)),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  // White scroll card
-                  Expanded(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F7FA),
-                        borderRadius: BorderRadius.only(
+                // ── White scroll card ─────────────────────────────────
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF5F7FA),
+                      borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
-                        ),
-                      ),
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
-                        child: Column(
+                          topRight: Radius.circular(30)),
+                    ),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
+                      child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Center(
                                 child: Container(
-                              width: 36,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                  color: const Color(0xFFDDDDDD),
-                                  borderRadius: BorderRadius.circular(2)),
-                            )),
-
+                                    width: 36,
+                                    height: 4,
+                                    decoration: BoxDecoration(
+                                        color: const Color(0xFFDDDDDD),
+                                        borderRadius:
+                                            BorderRadius.circular(2)))),
                             const SizedBox(height: 22),
 
                             // Stats
@@ -495,24 +488,38 @@ class _HealthProfilePageState extends State<HealthProfilePage>
 
                             const _SectionLabel('Settings'),
                             const SizedBox(height: 12),
+
+                            // ── Settings — all 3 now navigate properly ──────
                             _TapCard(items: [
                               _TapData(
                                   icon: Icons.notifications_rounded,
                                   label: 'Notifications',
-                                  onTap: () {}),
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const NotificationsPage()))),
                               _TapData(
                                   icon: Icons.security_rounded,
                                   label: 'Privacy & Security',
-                                  onTap: () {}),
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const PrivacySecurityPage()))),
                               _TapData(
                                   icon: Icons.help_outline_rounded,
                                   label: 'Help & Support',
-                                  onTap: () {}),
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const HelpSupportPage()))),
                             ]),
 
                             const SizedBox(height: 16),
 
-                            // Logout
+                            // Log out
                             GestureDetector(
                               onTap: _showLogoutDialog,
                               child: Container(
@@ -520,32 +527,28 @@ class _HealthProfilePageState extends State<HealthProfilePage>
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 15),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFFEDED),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
+                                    color: const Color(0xFFFFEDED),
+                                    borderRadius: BorderRadius.circular(16)),
                                 child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.logout_rounded,
-                                        color: Color(0xFFE53935), size: 19),
-                                    SizedBox(width: 9),
-                                    Text('Log Out',
-                                        style: TextStyle(
-                                            color: Color(0xFFE53935),
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins',
-                                            fontWeight: FontWeight.w600)),
-                                  ],
-                                ),
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.logout_rounded,
+                                          color: Color(0xFFE53935), size: 19),
+                                      SizedBox(width: 9),
+                                      Text('Log Out',
+                                          style: TextStyle(
+                                              color: Color(0xFFE53935),
+                                              fontSize: 15,
+                                              fontFamily: 'Poppins',
+                                              fontWeight: FontWeight.w600)),
+                                    ]),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ]),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ]),
             ),
           ],
         ),
@@ -553,6 +556,8 @@ class _HealthProfilePageState extends State<HealthProfilePage>
     );
   }
 }
+
+// ── Unchanged helper widgets ───────────────────────────────────────────────────
 
 class _NavBtn extends StatelessWidget {
   final IconData icon;
@@ -722,34 +727,34 @@ class _TapCard extends StatelessWidget {
                 items.length,
                 (i) => Column(children: [
                       GestureDetector(
-                          onTap: items[i].onTap,
-                          behavior: HitTestBehavior.opaque,
-                          child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 13),
-                              child: Row(children: [
-                                Container(
-                                    width: 34,
-                                    height: 34,
-                                    decoration: BoxDecoration(
-                                        color: const Color(0xFF0796DE)
-                                            .withOpacity(0.10),
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Icon(items[i].icon,
-                                        color: const Color(0xFF0796DE),
-                                        size: 17)),
-                                const SizedBox(width: 13),
-                                Expanded(
-                                    child: Text(items[i].label,
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'Poppins',
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xFF1E1E1E)))),
-                                const Icon(Icons.arrow_forward_ios_rounded,
-                                    size: 13, color: Color(0xFFBDBDBD)),
-                              ]))),
+                        onTap: items[i].onTap,
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 13),
+                            child: Row(children: [
+                              Container(
+                                  width: 34,
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF0796DE)
+                                          .withOpacity(0.10),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Icon(items[i].icon,
+                                      color: const Color(0xFF0796DE),
+                                      size: 17)),
+                              const SizedBox(width: 13),
+                              Expanded(
+                                  child: Text(items[i].label,
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF1E1E1E)))),
+                              const Icon(Icons.arrow_forward_ios_rounded,
+                                  size: 13, color: Color(0xFFBDBDBD)),
+                            ])),
+                      ),
                       if (i < items.length - 1)
                         Divider(
                             height: 1, indent: 56, color: Colors.grey.shade100),
