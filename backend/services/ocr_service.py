@@ -134,6 +134,11 @@ def extract_with_deepseek(ocr_text: str, retries: int = MAX_RETRIES) -> dict:
         except Exception as e:
             err_str = str(e)
             print(f"DeepSeek attempt {attempt} error: {err_str}")
+            if "429" in err_str or "rate" in err_str.lower():
+                if attempt <= retries:
+                    time.sleep(5 * attempt)
+                    continue
+                return {"error": "QUOTA_EXCEEDED"}
             if attempt <= retries:
                 time.sleep(3)
                 continue
