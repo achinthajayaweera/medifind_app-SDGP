@@ -5,7 +5,6 @@ import os
 
 app = FastAPI(title="MediFind Backend API")
 
-# CORS - allow the Android emulator and web to reach the backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -13,6 +12,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the MediFind Python Backend API!"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)
