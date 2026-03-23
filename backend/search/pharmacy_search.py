@@ -134,3 +134,11 @@ async def search_pharmacies(
             distance_meters=float(row["distance_meters"]),
             is_full_match=bool(row["is_full_match"]),
             matched_medicines=int(row["matched_medicines"]),
+            total_required=int(row["total_required"]),
+            total_price=float(row["total_price"]),
+            items=items,
+        )
+
+        if result.is_full_match:
+            full_matches.append(result)
+        else:
