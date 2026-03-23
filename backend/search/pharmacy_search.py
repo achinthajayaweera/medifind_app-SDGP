@@ -70,3 +70,11 @@ async def search_pharmacies(
 
     How it works:
     1. Calls ONE Supabase RPC function (search_pharmacies)
+    2. That function does ALL the heavy lifting in PostgreSQL:
+       - Finds nearby open pharmacies (PostGIS spatial index)
+       - Joins inventory + brands tables
+       - Picks cheapest brand per medicine per pharmacy
+       - Checks stock quantity
+       - Aggregates total price
+       - Sorts by full match → price → distance
+    3. Python just splits the results into categories
