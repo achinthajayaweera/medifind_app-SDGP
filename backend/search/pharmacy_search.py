@@ -206,3 +206,11 @@ def response_to_dict(resp: SearchResponse) -> dict:
             "pharmacy_id": p.pharmacy_id,
             "pharmacy_name": p.pharmacy_name,
             "distance_meters": p.distance_meters,
+            "is_full_match": p.is_full_match,
+            "matched_medicines": p.matched_medicines,
+            "total_required": p.total_required,
+            "total_price": p.total_price,
+            "items": [item_dict(i) for i in p.items],
+        }
+
+    return {
