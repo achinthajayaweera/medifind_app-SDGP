@@ -158,3 +158,11 @@ async def search_pharmacies(
     return SearchResponse(
         best_match=None,
         alternatives=[],
+        partial_matches=partial_matches,
+        suggestion=suggestion,
+    )
+
+
+def _build_suggestion(partials: list[PharmacyResult], total: int) -> str:
+    """Generate a helpful fallback message."""
+    if not partials:
