@@ -198,3 +198,47 @@ def build_medicines_from_ocr_text(ocr_text: str) -> dict:
         "diagnosis_notes": "Extracted using OCR fallback",
         "medications": medicines
     }
+
+
+# ── Main pipeline ─────────────────────────────────────────────────────────────
+def process_prescription_image(image_path: str) -> dict:
+    """Process an uploaded prescription: EasyOCR -> DeepSeek -> fallback."""
+    processed_path = None
+    try:
+        # Step 1: pre-process & EasyOCR
+        processed_path = preprocess_image(image_path)
+        ocr_text = extract_text_easyocr(processed_path)
+        print(f"EasyOCR extracted {len(ocr_text)} chars: {ocr_text[:200]}")
+
+        if not ocr_text.strip():
+            return {
+                "confidence": "none",
+                "diagnosis_notes": "Could not read any text from the image. Please try a clearer photo.",
+                "medications": []
+            }
+
+        # Step 2: send OCR text to DeepSeek for structured extraction
+        result = extract_with_deepseek(ocr_text)
+
+        # Step 3: if DeepSeek failed, fall back to heuristic parser
+        if isinstance(result, dict) and "error" in result:
+            print(f"DeepSeek error: {result['error']}  ->  using heuristic fallback")
+            result = build_medicines_from_ocr_text(ocr_text)
+
+        # Ensure required fields
+        if "medications" not in result:
+            result["medications"] = []
+        if "diagnosis_notes" not in result:
+            result["diagnosis_notes"] = ""
+
+        return result
+
+    except Exception as e:
+        print(f"Error in process_prescription_image: {e}")
+        return {"error": str(e)}
+    finally:
+        if processed_path and os.path.exists(processed_path):
+            try:
+                os.remove(processed_path)
+            except Exception:
+                pass
