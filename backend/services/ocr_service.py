@@ -37,3 +37,8 @@ def preprocess_image(image_path: str) -> str:
     out_path = image_path + "_processed.png"
     img_contrast.save(out_path)
     return out_path
+
+
+# -- Handle low-res images --
+def _needs_upscaling(w, h):
+    return max(w, h) < 1000
