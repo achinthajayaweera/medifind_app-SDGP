@@ -3,6 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 app = FastAPI(title="MediFind Backend API")
 
 app.add_middleware(
