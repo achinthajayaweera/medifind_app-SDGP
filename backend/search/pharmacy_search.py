@@ -38,3 +38,11 @@ class SelectedItem:
 @dataclass
 class PharmacyResult:
     pharmacy_id: str
+    pharmacy_name: str
+    distance_meters: float
+    is_full_match: bool
+    matched_medicines: int
+    total_required: int
+    total_price: float
+    items: list[SelectedItem]
+
