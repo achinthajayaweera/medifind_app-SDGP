@@ -14,3 +14,11 @@ from dataclasses import dataclass
 # ── Supabase config (set these as Railway environment variables) ──
 SUPABASE_URL = os.environ["SUPABASE_URL"]       # https://xxxxx.supabase.co
 SUPABASE_KEY = os.environ["SUPABASE_ANON_KEY"]  # your anon/service key
+
+
+# ════════════════════════════════════════════════════
+# DATA STRUCTURES
+# ════════════════════════════════════════════════════
+
+@dataclass
+class MedicineRequest:
