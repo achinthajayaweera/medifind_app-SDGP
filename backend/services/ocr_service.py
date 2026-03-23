@@ -118,6 +118,7 @@ def extract_with_deepseek(ocr_text: str, retries: int = MAX_RETRIES) -> dict:
                 ],
                 temperature=0.1,
                 max_tokens=2048,
+                timeout=45.0,  # Enforce a strict 45-second timeout to prevent infinite hangs
             )
 
             raw_text = response.choices[0].message.content.strip()

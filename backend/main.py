@@ -34,19 +34,23 @@ def health_check():
 
 # OCR Endpoint — no strict auth required for dev; add back when in production
 @app.post("/api/ocr/upload")
-async def upload_prescription(file: UploadFile = File(...)):
+def upload_prescription(file: UploadFile = File(...)):
     """
     Endpoint to process prescription images using OCR (Gemini + EasyOCR fallback).
+    Runs synchronously so FastAPI offloads it to a background threadpool,
+    preventing the ASGI event loop from freezing during heavy DeepSeek/EasyOCR execution.
     """
     filename_lower = (file.filename or "").lower()
     if not any(filename_lower.endswith(ext) for ext in ['.png', '.jpg', '.jpeg']):
         raise HTTPException(status_code=400, detail="Invalid file type. Please upload a JPG or PNG image.")
 
-    temp_file_path = f"temp_{file.filename}"
-    try:
-        with open(temp_file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+    # Use a secure, thread-safe temporary file
+    import tempfile
+    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(filename_lower)[1]) as tmp:
+        shutil.copyfileobj(file.file, tmp)
+        temp_file_path = tmp.name
 
+    try:
         # Process with OCR pipeline (Gemini with EasyOCR fallback)
         result = process_prescription_image(temp_file_path)
 
@@ -62,6 +66,7 @@ async def upload_prescription(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
     finally:
+        # Ensure the safe temp file is cleaned up across all threads
         if os.path.exists(temp_file_path):
             try:
                 os.remove(temp_file_path)
