@@ -94,3 +94,11 @@ async def search_pharmacies(
         response = await client.post(
             f"{SUPABASE_URL}/rest/v1/rpc/search_pharmacies",
             headers={
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "user_lng": longitude,
+                "user_lat": latitude,
+                "radius_m": radius_meters,
