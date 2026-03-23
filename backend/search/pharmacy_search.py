@@ -190,3 +190,11 @@ def _build_suggestion(partials: list[PharmacyResult], total: int) -> str:
 # ════════════════════════════════════════════════════
 
 def response_to_dict(resp: SearchResponse) -> dict:
+    """Convert SearchResponse to a dict for JSON serialization."""
+
+    def item_dict(item: SelectedItem) -> dict:
+        return {
+            "medicine_id": item.medicine_id,
+            "brand_id": item.brand_id,
+            "brand_name": item.brand_name,
+            "price": item.price,
