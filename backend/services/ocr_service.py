@@ -93,3 +93,50 @@ def extract_text_easyocr(image_path: str) -> str:
     except Exception as e:
         print(f"EasyOCR error: {e}")
         return ""
+
+
+# ── DeepSeek structured extraction ───────────────────────────────────────────
+def extract_with_deepseek(ocr_text: str, retries: int = MAX_RETRIES) -> dict:
+    """Send OCR text to DeepSeek chat model and return parsed JSON."""
+    if not ocr_text.strip():
+        return {"error": "No text extracted from image"}
+
+    user_message = (
+        f"Here is the OCR text extracted from a prescription image:\n\n"
+        f"---\n{ocr_text}\n---\n\n"
+        f"Please extract all medicine and prescription details into the JSON format described."
+    )
+
+    for attempt in range(1, retries + 2):
+        try:
+            print(f"DeepSeek attempt {attempt}...")
+            response = client.chat.completions.create(
+                model=DEEPSEEK_MODEL,
+                messages=[
+                    {"role": "system", "content": EXTRACTION_PROMPT},
+                    {"role": "user",   "content": user_message},
+                ],
+                temperature=0.1,
+                max_tokens=2048,
+            )
+
+            raw_text = response.choices[0].message.content.strip()
+            print(f"DeepSeek raw response ({len(raw_text)} chars)")
+            return json.loads(raw_text)
+
+        except json.JSONDecodeError as je:
+            print(f"DeepSeek JSON parse error: {je}")
+            if attempt <= retries:
+                time.sleep(2)
+                continue
+            return {"error": f"Failed to parse DeepSeek response as JSON"}
+
+        except Exception as e:
+            err_str = str(e)
+            print(f"DeepSeek attempt {attempt} error: {err_str}")
+            if attempt <= retries:
+                time.sleep(3)
+                continue
+            return {"error": f"DeepSeek failed: {err_str}"}
+
+    return {"error": "DeepSeek failed after all retries"}
