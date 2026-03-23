@@ -110,3 +110,11 @@ async def search_pharmacies(
             timeout=15.0,
         )
         response.raise_for_status()
+        rows = response.json()
+
+    # ── Process results ──
+    full_matches: list[PharmacyResult] = []
+    partial_matches: list[PharmacyResult] = []
+
+    for row in rows:
+        items = [
