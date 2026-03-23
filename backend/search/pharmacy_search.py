@@ -30,3 +30,11 @@ class MedicineRequest:
 class SelectedItem:
     medicine_id: str
     brand_id: str
+    brand_name: str
+    price: float
+    quantity: int
+
+
+@dataclass
+class PharmacyResult:
+    pharmacy_id: str
