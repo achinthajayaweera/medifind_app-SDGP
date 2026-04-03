@@ -166,7 +166,7 @@ class _HealthProfilePageState extends State<HealthProfilePage>
   void _showLogoutDialog() {
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: Colors.black.withValues(alpha: 0.4),
       builder: (_) => Center(
         child: Material(
           color: Colors.transparent,
@@ -178,7 +178,7 @@ class _HealthProfilePageState extends State<HealthProfilePage>
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
+                    color: Colors.black.withValues(alpha: 0.12),
                     blurRadius: 30,
                     offset: const Offset(0, 10))
               ],
@@ -189,8 +189,8 @@ class _HealthProfilePageState extends State<HealthProfilePage>
                 Container(
                   width: 56,
                   height: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFEDED),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFFEDED),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.logout_rounded,
@@ -334,11 +334,11 @@ class _HealthProfilePageState extends State<HealthProfilePage>
                           shape: BoxShape.circle,
                           color: UserStore.instance.emoji.isEmpty
                               ? avatarColor
-                              : avatarColor.withOpacity(0.15),
+                              : avatarColor.withValues(alpha: 0.15),
                           border: Border.all(color: avatarColor, width: 3),
                           boxShadow: [
                             BoxShadow(
-                                color: avatarColor.withOpacity(0.4),
+                                color: avatarColor.withValues(alpha: 0.4),
                                 blurRadius: 24,
                                 offset: const Offset(0, 8))
                           ],
@@ -415,17 +415,17 @@ class _HealthProfilePageState extends State<HealthProfilePage>
                                   icon: Icons.bloodtype_rounded,
                                   color: const Color(0xFFFF5B5B)),
                               const SizedBox(width: 10),
-                              _StatChip(
+                              const _StatChip(
                                   label: 'Age',
                                   value: '34',
                                   icon: Icons.cake_rounded,
-                                  color: const Color(0xFF0796DE)),
+                                  color: Color(0xFF0796DE)),
                               const SizedBox(width: 10),
-                              _StatChip(
+                              const _StatChip(
                                   label: 'Weight',
                                   value: '70 kg',
                                   icon: Icons.monitor_weight_rounded,
-                                  color: const Color(0xFF27AE60)),
+                                  color: Color(0xFF27AE60)),
                             ]),
 
                             const SizedBox(height: 26),
@@ -445,7 +445,7 @@ class _HealthProfilePageState extends State<HealthProfilePage>
                                   value: UserStore.instance.dateOfBirth.isEmpty
                                       ? 'Not set'
                                       : UserStore.instance.dateOfBirth),
-                              _RowData(
+                              const _RowData(
                                   icon: Icons.location_on_rounded,
                                   label: 'Address',
                                   value: 'Colombo, Sri Lanka'),
@@ -469,7 +469,7 @@ class _HealthProfilePageState extends State<HealthProfilePage>
                                           .instance.chronicConditions.isEmpty
                                       ? 'None recorded'
                                       : UserStore.instance.chronicConditions),
-                              _RowData(
+                              const _RowData(
                                   icon: Icons.medication_rounded,
                                   label: 'Current Medications',
                                   value: 'None recorded'),
@@ -549,7 +549,7 @@ class _NavBtn extends StatelessWidget {
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.20),
+              color: Colors.white.withValues(alpha: 0.20),
               borderRadius: BorderRadius.circular(11)),
           child: Icon(icon, color: Colors.white, size: 17)));
 }
@@ -572,7 +572,7 @@ class _StatChip extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                    color: color.withOpacity(0.10),
+                    color: color.withValues(alpha: 0.10),
                     blurRadius: 12,
                     offset: const Offset(0, 4))
               ]),
@@ -581,7 +581,7 @@ class _StatChip extends StatelessWidget {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                    color: color.withOpacity(0.11), shape: BoxShape.circle),
+                    color: color.withValues(alpha: 0.11), shape: BoxShape.circle),
                 child: Icon(icon, color: color, size: 17)),
             const SizedBox(height: 7),
             Text(value,
@@ -631,7 +631,7 @@ class _GroupCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 12,
                   offset: const Offset(0, 4))
             ]),
@@ -648,7 +648,7 @@ class _GroupCard extends StatelessWidget {
                                 height: 34,
                                 decoration: BoxDecoration(
                                     color: const Color(0xFF0796DE)
-                                        .withOpacity(0.10),
+                                        .withValues(alpha: 0.10),
                                     borderRadius: BorderRadius.circular(10)),
                                 child: Icon(items[i].icon,
                                     color: const Color(0xFF0796DE), size: 17)),
@@ -697,7 +697,7 @@ class _TapCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 12,
                   offset: const Offset(0, 4))
             ]),
@@ -717,7 +717,7 @@ class _TapCard extends StatelessWidget {
                                     height: 34,
                                     decoration: BoxDecoration(
                                         color: const Color(0xFF0796DE)
-                                            .withOpacity(0.10),
+                                            .withValues(alpha: 0.10),
                                         borderRadius:
                                             BorderRadius.circular(10)),
                                     child: Icon(items[i].icon,
