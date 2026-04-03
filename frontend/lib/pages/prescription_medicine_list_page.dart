@@ -84,7 +84,8 @@ const List<Medicine> _demoMedicines = [
 // ── Page ──────────────────────────────────────────────────────────────────────
 class PrescriptionMedicineListPage extends StatefulWidget {
   final List<Medicine>? medicines;
-  const PrescriptionMedicineListPage({super.key, this.medicines});
+  final List<dynamic>? rawMedications;
+  const PrescriptionMedicineListPage({super.key, this.medicines, this.rawMedications});
   @override
   State<PrescriptionMedicineListPage> createState() =>
       _PrescriptionMedicineListPageState();
@@ -313,7 +314,9 @@ class _PrescriptionMedicineListPageState
                         onPressed: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const NearbyPharmacyPage())),
+                                builder: (_) => NearbyPharmacyPage(
+                                    rawMedications: widget.rawMedications,
+                                ))),
                         style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0796DE),
                             elevation: 0,

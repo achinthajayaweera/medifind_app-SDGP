@@ -57,6 +57,7 @@ class ApiService {
 
         return {
           'medicines': parsedMedicines,
+          'rawMedications': medsList,  // Keep raw data for pharmacy search
           'medicalHistory': medicalHistory,
           'confidence': confidence,
           'success': true,
@@ -75,6 +76,62 @@ class ApiService {
     } catch (e) {
       debugPrint('ApiService error: $e');
       return {'success': false, 'error': 'Upload failed: ${e.toString()}'};
+    }
+  }
+
+  /// Search pharmacies using OCR-extracted medication names.
+  /// [medications] should be the raw medications list from the OCR result.
+  /// [latitude] and [longitude] are the user's current location.
+  static Future<Map<String, dynamic>> searchPharmaciesByPrescription({
+    required double latitude,
+    required double longitude,
+    required List<dynamic> medications,
+    int radiusMeters = 7000,
+  }) async {
+    try {
+      debugPrint('ApiService: searching pharmacies at $_baseUrl/pharmacy/search-by-prescription');
+
+      // Build medication list for the API
+      final medList = medications.map((med) {
+        if (med == null) return null;
+        return {
+          'drug_name': (med['drug_name'] ?? '').toString(),
+          'quantity': (med['quantity'] ?? '1').toString(),
+          'strength': (med['strength'] ?? '').toString(),
+          'dosage_form': (med['dosage_form'] ?? '').toString(),
+        };
+      }).where((m) => m != null).toList();
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl/pharmacy/search-by-prescription'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'latitude': latitude,
+          'longitude': longitude,
+          'medications': medList,
+          'radius_meters': radiusMeters,
+        }),
+      ).timeout(const Duration(seconds: 30));
+
+      debugPrint('ApiService: pharmacy search status = ${response.statusCode}');
+      debugPrint('ApiService: pharmacy search body = ${response.body}');
+
+      if (response.statusCode == 200) {
+        final jsonMap = jsonDecode(response.body) as Map<String, dynamic>;
+        return {'success': true, ...jsonMap};
+      } else {
+        String errorMsg = 'Pharmacy search failed (${response.statusCode})';
+        try {
+          final errJson = jsonDecode(response.body);
+          errorMsg = errJson['detail'] ?? errorMsg;
+        } catch (_) {}
+        return {'success': false, 'error': errorMsg};
+      }
+    } on SocketException {
+      return {'success': false, 'error': 'Cannot connect to server.'};
+    } catch (e) {
+      debugPrint('ApiService pharmacy search error: $e');
+      return {'success': false, 'error': 'Pharmacy search failed: ${e.toString()}'};
     }
   }
 }

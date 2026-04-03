@@ -227,7 +227,8 @@ const _savedAddresses = [
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 class NearbyPharmacyPage extends StatefulWidget {
-  const NearbyPharmacyPage({super.key});
+  final List<dynamic>? rawMedications;
+  const NearbyPharmacyPage({super.key, this.rawMedications});
   @override
   State<NearbyPharmacyPage> createState() => _NearbyPharmacyPageState();
 }
