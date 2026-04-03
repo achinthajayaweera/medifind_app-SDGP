@@ -32,9 +32,13 @@ class ApiService {
           if (med == null) continue;
           final typeStr = (med['dosage_form'] ?? '').toString().toLowerCase();
           MedicineType mType = MedicineType.tablet;
-          if (typeStr.contains('capsule')) mType = MedicineType.capsule;
-          else if (typeStr.contains('syrup') || typeStr.contains('liquid')) mType = MedicineType.syrup;
-          else if (typeStr.contains('vitamin')) mType = MedicineType.vitamin;
+          if (typeStr.contains('capsule')) {
+            mType = MedicineType.capsule;
+          } else if (typeStr.contains('syrup') || typeStr.contains('liquid')) {
+            mType = MedicineType.syrup;
+          } else if (typeStr.contains('vitamin')) {
+            mType = MedicineType.vitamin;
+          }
 
           final instructionParts = [
             med['instructions'], med['frequency'], med['duration']
