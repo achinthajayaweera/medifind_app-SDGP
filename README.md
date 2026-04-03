@@ -1,1 +1,0 @@
-# medifind_app-SDGP
