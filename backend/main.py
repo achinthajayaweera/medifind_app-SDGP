@@ -10,8 +10,17 @@ import shutil
 from typing import Optional
 
 from services.ocr_service import process_prescription_image
+from services.password_reset_service import PasswordResetService
 
 app = FastAPI(title="MediFind Backend API")
+_password_reset_service: PasswordResetService | None = None
+
+
+def _get_password_reset_service() -> PasswordResetService:
+    global _password_reset_service
+    if _password_reset_service is None:
+        _password_reset_service = PasswordResetService()
+    return _password_reset_service
 
 # CORS — allow the Android emulator and web to reach the backend
 app.add_middleware(
@@ -91,6 +100,48 @@ class PrescriptionSearchRequest(BaseModel):
     longitude: float
     medications: list[MedicationInput]
     radius_meters: int = 7000
+
+
+class PasswordResetRequest(BaseModel):
+    identifier: str = Field(min_length=1, max_length=255)
+
+
+class PasswordResetVerifyRequest(BaseModel):
+    identifier: str = Field(min_length=1, max_length=255)
+    otp: str = Field(min_length=4, max_length=10)
+    new_password: str = Field(min_length=6, max_length=128)
+
+
+@app.post("/api/auth/password-reset/request")
+def request_password_reset(req: PasswordResetRequest):
+    try:
+        service = _get_password_reset_service()
+        result = service.request_password_reset_otp(req.identifier)
+        return {"success": True, **result}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to process OTP request.")
+
+
+@app.post("/api/auth/password-reset/verify")
+def verify_password_reset(req: PasswordResetVerifyRequest):
+    try:
+        service = _get_password_reset_service()
+        result = service.verify_otp_and_reset_password(
+            identifier=req.identifier,
+            otp=req.otp,
+            new_password=req.new_password,
+        )
+        return {"success": True, **result}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to reset password.")
 
 
 @app.post("/api/pharmacy/search")
